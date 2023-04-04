@@ -213,7 +213,7 @@ function createTank(scene) {
 
     // to avoid firing too many cannonball rapidly
     tank.canIceCannonBalls = true;
-    tank.iceCannonBallsAfter = 0.1; // in seconds
+    tank.iceCannonBallsAfter = 0.5; // in seconds
 
     ///////////////////////////
 
@@ -236,26 +236,27 @@ function createTank(scene) {
 
         for (let i = 0; i < 7; i++) {
             iceballs[i] = scene.getMeshByName("iceball").clone("iceball_" + i);
-            iceballs[i].frontVector = this.frontVector;
-
-
+            let angle = Math.PI / 2 / 7 * i;
+            iceballs[i].frontVector = new BABYLON.Vector3(this.frontVector.x + angle, this.frontVector.y , this.frontVector.z+ angle) ;
             let pos = this.position;
             // position the iceballs[i] above the tank
             iceballs[i].position = new BABYLON.Vector3(pos.x, pos.y + 10, pos.z);
             // move iceballs[i] position from above the center of the tank to above a bit further than the frontVector end (5 meter s further)
             iceballs[i].position.addInPlace(this.frontVector.multiplyByFloats(5, 5, 5));
 
-            // add physics to the iceballs[i], mass must be non null to see gravity apply
-            iceballs[i].physicsImpostor = new BABYLON.PhysicsImpostor(iceballs[i],
-                BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1 }, scene);
+            // rotate the iceballs in the direction of the frontVector
+            iceballs[i].rotation.y = Math.atan2(this.frontVector.x + angle  , this.frontVector.z + angle);
 
-            // the iceballs[i] needs to be fired, so we need an impulse !
-            // we apply it to the center of the sphere
-            let powerOfFire = 100;
-            let azimuth = 0.1;
-            let aimForceVector = new BABYLON.Vector3(this.frontVector.x * powerOfFire, (this.frontVector.y + azimuth) * powerOfFire, this.frontVector.z * powerOfFire);
+            // Move the iceballs[i] in the same direction of the front vector during 3 seconds before disposing it
+        
+            let duration = 500; // 0.5 seconds
 
-            iceballs[i].physicsImpostor.applyImpulse(aimForceVector, iceballs[i].getAbsolutePosition());
+            let moveId = setInterval(() => {
+                // move with collision
+                iceballs[i].moveWithCollisions(iceballs[i].frontVector.multiplyByFloats(1,1,1));
+                // iceballs[i].position.addInPlace(iceballs[i].frontVector.multiplyByFloats(1,1,1));
+            }, 1);
+
 
             iceballs[i].actionManager = new BABYLON.ActionManager(scene);
             // register an action for when the iceballs[i] intesects a dude, so we need to iterate on each dude
@@ -274,11 +275,14 @@ function createTank(scene) {
                     }
                 ));
             });
-
-            // Make the iceballs[i] disappear after 3s
+            
             setTimeout(() => {
+                clearInterval(moveId);
                 iceballs[i].dispose();
-            }, 3000);
+            }, duration);
+
+            
+
         }
     }
 
