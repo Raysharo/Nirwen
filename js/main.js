@@ -236,16 +236,23 @@ function createTank(scene) {
 
         for (let i = 0; i < 7; i++) {
             iceballs[i] = scene.getMeshByName("iceball").clone("iceball_" + i);
-            let angle = Math.PI / 2 / 7 * i;
-            iceballs[i].frontVector = new BABYLON.Vector3(this.frontVector.x + angle, this.frontVector.y , this.frontVector.z+ angle) ;
+            // let angle = Math.PI / 2 / 7 * i;
+            // iceballs[i].frontVector = new BABYLON.Vector3(this.frontVector.x + angle, this.frontVector.y , this.frontVector.z+ angle) ;
             let pos = this.position;
             // position the iceballs[i] above the tank
             iceballs[i].position = new BABYLON.Vector3(pos.x, pos.y + 10, pos.z);
             // move iceballs[i] position from above the center of the tank to above a bit further than the frontVector end (5 meter s further)
             iceballs[i].position.addInPlace(this.frontVector.multiplyByFloats(5, 5, 5));
 
+
+
+            iceballs[i].rotation.y = tank.rotation.y + (4 - i) * 0.5;
+            iceballs[i].frontVector = new BABYLON.Vector3(Math.sin(iceballs[i].rotation.y), 0, Math.cos(iceballs[i].rotation.y))
+
+
+
             // rotate the iceballs in the direction of the frontVector
-            iceballs[i].rotation.y = Math.atan2(this.frontVector.x + angle  , this.frontVector.z + angle);
+            //iceballs[i].rotation.y = Math.atan2(this.frontVector.x + angle  , this.frontVector.z + angle);
 
             // Move the iceballs[i] in the same direction of the front vector during 3 seconds before disposing it
         
