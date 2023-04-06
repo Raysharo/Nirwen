@@ -129,13 +129,27 @@ function createFreeCamera(scene) {
     return camera;
 }
 
-function createFollowCamera(scene, target) {
+function createFollowCameraV1(scene, target) {
     console.log(target)
     let camera = new BABYLON.FollowCamera("tankFollowCamera", target.position, scene, target);
 
     camera.radius = 200; // how far from the object to follow
     camera.heightOffset = 100; // how high above the object to place the camera
     camera.rotationOffset = 135; // the viewing angle
+    camera.cameraAcceleration = .1; // how fast to move
+    camera.maxCameraSpeed = 5; // speed limit
+
+    return camera;
+}
+
+// V2
+function createFollowCamera(scene, target) {
+    console.log(target)
+    let camera = new BABYLON.FollowCamera("tankFollowCamera", target.position, scene, target);
+
+    camera.radius = 0; // how far from the object to follow
+    camera.heightOffset = 200; // how high above the object to place the camera
+    camera.rotationOffset = 0; // the viewing angle
     camera.cameraAcceleration = .1; // how fast to move
     camera.maxCameraSpeed = 5; // speed limit
 
@@ -233,15 +247,16 @@ function createTank(scene) {
         // Create a canonball
 
         let iceballs = [];
+        let nb_iceballs = 7;
 
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < nb_iceballs; i++) {
             iceballs[i] = scene.getMeshByName("iceball").clone("iceball_" + i);
             let angle = 0.25;
             let pos = this.position;
             // position the iceballs[i] above the tank
             iceballs[i].position = new BABYLON.Vector3(pos.x, pos.y + 10, pos.z);
             // rotate the iceballs[i] to face the frontVector with a small angle
-            iceballs[i].rotation.y = tank.rotation.y + (4 - i) * angle;
+            iceballs[i].rotation.y = tank.rotation.y + (nb_iceballs/2 - i) * angle;
             // set the frontVector of the iceballs[i] to the direction of the frontVector
             iceballs[i].frontVector = new BABYLON.Vector3(Math.sin(iceballs[i].rotation.y), 0, Math.cos(iceballs[i].rotation.y))
             
