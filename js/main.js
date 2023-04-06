@@ -142,7 +142,7 @@ function createFollowCameraV1(scene, target) {
     return camera;
 }
 
-// V2
+// V2 --> depuis le plafond
 function createFollowCamera(scene, target) {
     console.log(target)
     let camera = new BABYLON.FollowCamera("tankFollowCamera", target.position, scene, target);
@@ -256,7 +256,7 @@ function createTank(scene) {
             // position the iceballs[i] above the tank
             iceballs[i].position = new BABYLON.Vector3(pos.x, pos.y + 10, pos.z);
             // rotate the iceballs[i] to face the frontVector with a small angle
-            iceballs[i].rotation.y = tank.rotation.y + (nb_iceballs/2 - i) * angle;
+            iceballs[i].rotation.y = tank.rotation.y + ((nb_iceballs-1)/2 - i) * angle;
             // set the frontVector of the iceballs[i] to the direction of the frontVector
             iceballs[i].frontVector = new BABYLON.Vector3(Math.sin(iceballs[i].rotation.y), 0, Math.cos(iceballs[i].rotation.y))
             
