@@ -78,6 +78,7 @@ function createIcePick(scene) {
         ice.scaling = new BABYLON.Vector3(1, 1, 1);
         ice.rotation = new BABYLON.Vector3(Math.PI / 2 , 0 , 0);
         ice.name = "iceball";
+        ice.isVisible = false;
     })
 }
 
@@ -251,6 +252,7 @@ function createTank(scene) {
 
         for (let i = 0; i < nb_iceballs; i++) {
             iceballs[i] = scene.getMeshByName("iceball").clone("iceball_" + i);
+            iceballs[i].isVisible = true;
             let angle = 0.25;
             let pos = this.position;
             // position the iceballs[i] above the tank
