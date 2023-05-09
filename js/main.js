@@ -6,6 +6,8 @@ let scene;
 // vars for handling inputs
 let inputStates = {};
 
+let musics = {};
+
 window.onload = startGame;
 
 function startGame() {
@@ -28,7 +30,9 @@ function startGame() {
 
     let iceball = scene.getMeshByName("iceball");
 
+    init_music(scene)
 
+    
 
     engine.runRenderLoop(() => {
         let deltaTime = engine.getDeltaTime(); // remind you something ?
@@ -46,6 +50,25 @@ function startGame() {
 
         scene.render();
     });
+}
+
+function init_music(scene) {
+    
+    let main_music;
+    
+    // Load the sound and play it automatically once ready
+    main_music = new BABYLON.Sound("MainMusic", "music/coniferous-forest.mp3", scene, null, {
+        loop: true,
+        autoplay: true,
+    });
+    let menu_music; // aussi post game-over
+    menu_music = new BABYLON.Sound("MenuMusic", "music/mysterious-lost-places-mystically-enigmatic-music-dripping-water.mp3", scene, null, {
+        loop: true,
+    });
+
+    musics.main_music = main_music;
+    musics.menu_music = menu_music;
+    musics.current_music = main_music;
 }
 
 
@@ -327,6 +350,9 @@ function createTank(scene) {
                     // see Dude class, line 16 ! dudeMesh.Dude = this;
                     () => {
                         dude.Dude.bounder.dispose();
+                        let sound = new BABYLON.Sound("hurt_ennemi", "sounds/person-knocked-down.mp3", scene, function () {
+                            sound.play();
+                        });
                         dude.dispose();
                     }
                 ));
@@ -551,6 +577,9 @@ function createTank(scene) {
 
             let sound = new BABYLON.Sound("death_tank", "./sounds/tubular-bell-of-death.mp3", scene, function () {
                 sound.play();
+                musics.current_music.stop();
+                musics.current_music = musics.menu_music;
+                musics.current_music.play();
             });
 
 
@@ -691,9 +720,6 @@ function createTank(scene) {
     return tank;
 }
 
-function summonParticle(scene, position) {
-
-}
 
 function create_room(scene) {
     BABYLON.SceneLoader.ImportMesh("", "models/", "RoomV4.babylon", scene, function (newMeshes) {
