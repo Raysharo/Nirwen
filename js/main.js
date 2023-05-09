@@ -38,7 +38,7 @@ function startGame() {
         tank.fireLasers();      // will fire only if l is pressed !
         tank.forceshield();
 
-        tank.takeDamage(5); // debug
+        tank.takeDamage(50); // debug
 
         //moveHeroDude();
         moveOtherDudes();
@@ -445,27 +445,26 @@ function createTank(scene) {
     tank.isInvincible = false;
 
     tank.takeDamage = function(damage) {
-
-        if(!tank.sucide) return;
+        if(!inputStates.sucide || tank.isInvincible) return;
+        tank.healthPoints -= damage;
         
         // if health points are 0, tank is destroyed
-        if(tank.health <= 0){
+        if(tank.healthPoints <= 0){
             // tank is destroyed
             console.log("Tank destroyed")
-            const sound = new BABYLON.Sound("hurt_oof", "./sounds/tubular-bell-of-death.mp3", scene);
+            let sound = new BABYLON.Sound("death_tank", "./sounds/tubular-bell-of-death.mp3", scene);
             //Leave time for the sound file to load before playing it
             sound.play();
-
 
             // particules for the animation of the death of the tank
             // Create a particle system
             let particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
 
             //Texture of each particle
-            particleSystem.particleTexture = new BABYLON.Texture("textures/flare.png", scene);
+            particleSystem.particleTexture = new BABYLON.Texture("./images/green_flare.jpg", scene);
 
             // Where the particles come from
-            particleSystem.emitter = BABYLON.Vector3.Zero(); // the starting position
+            particleSystem.emitter = tank.position; // the starting position
             particleSystem.minEmitBox = new BABYLON.Vector3(-1, -1, -1); // Bottom Left Front
             particleSystem.maxEmitBox = new BABYLON.Vector3(1, 1, 1); // Top Right Back
 
@@ -479,8 +478,8 @@ function createTank(scene) {
             particleSystem.maxSize = 0.5;
 
             // Life time of each particle (random between...
-            particleSystem.minLifeTime = 0.3;
-            particleSystem.maxLifeTime = 1.5;
+            particleSystem.minLifeTime = 0.2;
+            particleSystem.maxLifeTime = 0.5;
 
             // Emission rate
             particleSystem.emitRate = 1500;
@@ -507,16 +506,16 @@ function createTank(scene) {
             // stop the particle system after 3 seconds
             setTimeout(() => {
                 particleSystem.stop();
-            }, 3000);
+            }, 500);
 
 
         }
         // else, tank become invincible for a while if it's not already
-        else if(!tank.isInvincible){
+        else {
             // play sound when tank is hitten
-            const sound = new BABYLON.Sound("hurt_oof", "./sounds/hurt_oof.mp3", scene);
+            let sound = new BABYLON.Sound("hurt_oof", "./sounds/hurt_oof.mp3", scene);
             //Leave time for the sound file to load before playing it
-            sound.play();
+            sound.play();   
             // lose health points
             tank.healthPoints -= damage
             // tank become invincible for a while
