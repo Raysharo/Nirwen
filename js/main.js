@@ -22,6 +22,7 @@ function startGame() {
 
 
 
+    // let tank = scene.getMeshByName("ori");
     let tank = scene.getMeshByName("heroTank");
     let pt_fixe = scene.getMeshByName("cam_lock");
 
@@ -54,6 +55,7 @@ function createScene() {
     let freeCamera = createFreeCamera(scene);
 
     let pt_fixe = create_pt_fixe_camera(scene);
+    importOri(scene)
     let tank = createTank(scene);
     // create_room();
 
@@ -173,12 +175,45 @@ function create_pt_fixe_camera(scene) {
 }
 
 let zMovement = 5;
+
+
+function importOri(scene){
+    const assetsManager = new BABYLON.AssetsManager(scene);
+
+    const meshTask = assetsManager.addMeshTask("Ori", "models/prin/oriTPose.babylon", "oriTPose.babylon");
+
+    meshTask.onSuccess = function (task) {
+        let ori = task.loadedMeshes[0];
+        ori.position = new BABYLON.Vector3(0, 2, 0);
+        ori.scaling = new BABYLON.Vector3(2, 2, 2);
+        ori.name = "ori";
+        ori.isVisible = true;
+      };
+
+      meshTask.onError = function (task, message, exception) {
+        console.log(message, exception);
+      };
+
+    assetsManager.load();
+}
+
+
+
 function createTank(scene) {
+
+    
+    // importOri(scene);
+    let tankBis = scene.getMeshByName("ori");
+
+    
+
+
     let tank = new BABYLON.MeshBuilder.CreateBox("heroTank", { height: 1, depth: 6, width: 6 }, scene);
     let tankMaterial = new BABYLON.StandardMaterial("tankMaterial", scene);
     tankMaterial.diffuseColor = new BABYLON.Color3.Red;
     tankMaterial.emissiveColor = new BABYLON.Color3.Blue;
     tank.material = tankMaterial;
+    
     // tank cannot be picked by rays, but tank will not be pickable by any ray from other
     // players.... !
     //tank.isPickable = false; 
@@ -304,10 +339,6 @@ function createTank(scene) {
 
         }
     }
-
-
-
-
 
 
     // //////////////////////////////////
