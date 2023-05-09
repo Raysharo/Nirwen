@@ -283,10 +283,8 @@ function createTank(scene) {
                     }, // dude is the mesh, Dude is the instance if Dude class that has a bbox as a property named bounder.
                     // see Dude class, line 16 ! dudeMesh.Dude = this;
                     () => {
-                        // console.log("HIT !")
                         dude.Dude.bounder.dispose();
                         dude.dispose();
-                        //iceballs[i].dispose(); // don't work properly why ? Need for a closure ?
                     }
                 ));
             });
@@ -295,8 +293,6 @@ function createTank(scene) {
                 clearInterval(moveId);
                 iceballs[i].dispose();
             }, duration);
-
-            
 
         }
     }

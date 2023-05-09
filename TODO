@@ -1,8 +1,3 @@
-- Detect collisions between icepick and other
-- Orienté correctement les icepicks
-- SOit use move with collision --> mais les icepicks peuvent se percuter entre eux
-- soit modifier motition --> mais les icepicks passes au travers des dudes
 
-- les picks s'oriente qu'à droite
 
 6note pour Majoub --> try use les librairies gbf loader pour loder les files avec les animations comprises
