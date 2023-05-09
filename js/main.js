@@ -452,9 +452,11 @@ function createTank(scene) {
         if(tank.healthPoints <= 0){
             // tank is destroyed
             console.log("Tank destroyed")
-            let sound = new BABYLON.Sound("death_tank", "./sounds/tubular-bell-of-death.mp3", scene);
-            //Leave time for the sound file to load before playing it
-            sound.play();
+            
+
+            let sound = new BABYLON.Sound("death_tank", "./sounds/tubular-bell-of-death.mp3", scene, function () {
+                sound.play();
+            });
 
             // particules for the animation of the death of the tank
             // Create a particle system
@@ -513,7 +515,9 @@ function createTank(scene) {
         // else, tank become invincible for a while if it's not already
         else {
             // play sound when tank is hitten
-            let sound = new BABYLON.Sound("hurt_oof", "./sounds/hurt_oof.mp3", scene);
+            let sound = new BABYLON.Sound("hurt_oof", "./sounds/hurt_oof.mp3", scene, function () {
+                sound.play();
+            });
             //Leave time for the sound file to load before playing it
             sound.play();   
             // lose health points
