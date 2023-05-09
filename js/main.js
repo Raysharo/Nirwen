@@ -38,6 +38,8 @@ function startGame() {
         tank.fireLasers();      // will fire only if l is pressed !
         tank.forceshield();
 
+        tank.takeDamage(5); // debug
+
         //moveHeroDude();
         moveOtherDudes();
 
@@ -437,8 +439,93 @@ function createTank(scene) {
 
     }
 
+    // tank lose health points when hitten
+    tank.healthPoints = 100
+    tank.recoveryTime = 1 // in seconds;
+    tank.isInvincible = false;
+
+    tank.takeDamage = function(damage) {
+
+        if(!tank.sucide) return;
+        
+        // if health points are 0, tank is destroyed
+        if(tank.health <= 0){
+            // tank is destroyed
+            console.log("Tank destroyed")
+            const sound = new BABYLON.Sound("hurt_oof", "./sounds/tubular-bell-of-death.mp3", scene);
+            //Leave time for the sound file to load before playing it
+            sound.play();
 
 
+            // particules for the animation of the death of the tank
+            // Create a particle system
+            let particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+
+            //Texture of each particle
+            particleSystem.particleTexture = new BABYLON.Texture("textures/flare.png", scene);
+
+            // Where the particles come from
+            particleSystem.emitter = BABYLON.Vector3.Zero(); // the starting position
+            particleSystem.minEmitBox = new BABYLON.Vector3(-1, -1, -1); // Bottom Left Front
+            particleSystem.maxEmitBox = new BABYLON.Vector3(1, 1, 1); // Top Right Back
+
+            // Colors of all particles
+            particleSystem.color1 = new BABYLON.Color4(0.7, 0.8, 1.0, 1.0);
+            particleSystem.color2 = new BABYLON.Color4(0.2, 0.5, 1.0, 1.0);
+            particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+
+            // Size of each particle (random between...
+            particleSystem.minSize = 0.1;
+            particleSystem.maxSize = 0.5;
+
+            // Life time of each particle (random between...
+            particleSystem.minLifeTime = 0.3;
+            particleSystem.maxLifeTime = 1.5;
+
+            // Emission rate
+            particleSystem.emitRate = 1500;
+
+            // Set the gravity of all particles
+            particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+            // Direction of each particle after it has been emitted
+            particleSystem.direction1 = new BABYLON.Vector3(-7, 8, 3);
+            particleSystem.direction2 = new BABYLON.Vector3(7, 8, -3);
+
+            // Angular speed, in radians
+            particleSystem.minAngularSpeed = 0;
+            particleSystem.maxAngularSpeed = Math.PI;
+
+            // Speed
+            particleSystem.minEmitPower = 1;
+            particleSystem.maxEmitPower = 3;
+            particleSystem.updateSpeed = 0.005;
+
+            // Start the particle system
+            particleSystem.start();
+
+            // stop the particle system after 3 seconds
+            setTimeout(() => {
+                particleSystem.stop();
+            }, 3000);
+
+
+        }
+        // else, tank become invincible for a while if it's not already
+        else if(!tank.isInvincible){
+            // play sound when tank is hitten
+            const sound = new BABYLON.Sound("hurt_oof", "./sounds/hurt_oof.mp3", scene);
+            //Leave time for the sound file to load before playing it
+            sound.play();
+            // lose health points
+            tank.healthPoints -= damage
+            // tank become invincible for a while
+            tank.isInvincible = true;
+            setTimeout(() => {
+                tank.isInvincible = false;
+            }, 1000 * tank.recoveryTime);
+        }
+    }
 
 
     // FORCESHIELD
@@ -640,6 +727,7 @@ function modifySettings() {
 
     inputStates.ice = false;
     inputStates.forceshield = false;
+    inputStates.sucide = false;
 
 
     //add the listener to the main, window object, and update the states
@@ -662,6 +750,9 @@ function modifySettings() {
         else if ((event.key === "f") || (event.key === "F")) {
             inputStates.forceshield = true;
         } 
+        else if ((event.key === "k") || (event.key === "K")) {
+            inputStates.sucide = true;
+        } 
     }, false);
 
     //if the key will be released, change the states object 
@@ -683,6 +774,10 @@ function modifySettings() {
         } else if ((event.key === "f") || (event.key === "F")) {
             inputStates.forceshield = false;
         } 
+        else if ((event.key === "k") || (event.key === "K")) {
+            inputStates.sucide = false;
+        } 
+        
 
     }, false);
 }
