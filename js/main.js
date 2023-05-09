@@ -248,6 +248,11 @@ function createTank(scene) {
             this.canIceCannonBalls = true;
         }, 1000 * this.iceCannonBallsAfter);
 
+        // play the sound
+        let sound = new BABYLON.Sound("ice", "./sounds/ice.mp3", scene, function () {
+            sound.play();
+        });
+
         // Create a canonball
 
         let iceballs = [];
