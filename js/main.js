@@ -271,12 +271,12 @@ function createTank(scene) {
         }
         if (inputStates.left) {
             //tank.moveWithCollisions(new BABYLON.Vector3(-1*tank.speed, 0, 0));
-            tank.rotation.y -= 0.02;
+            tank.rotation.y -= 0.04;
             tank.frontVector = new BABYLON.Vector3(Math.sin(tank.rotation.y), 0, Math.cos(tank.rotation.y));
         }
         if (inputStates.right) {
             //tank.moveWithCollisions(new BABYLON.Vector3(1*tank.speed, 0, 0));
-            tank.rotation.y += 0.02;
+            tank.rotation.y += 0.04;
             tank.frontVector = new BABYLON.Vector3(Math.sin(tank.rotation.y), 0, Math.cos(tank.rotation.y));
         }
 
@@ -707,30 +707,33 @@ function createTank(scene) {
         particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
 
         // Size of each particle (random between...
-        particleSystem.minSize = 0.1;
-        particleSystem.maxSize = 0.5;
+        particleSystem.minSize = 0.2;
+        particleSystem.maxSize = 0.7;
 
         // Life time of each particle (random between...
-        particleSystem.minLifeTime = 0.15;
-        particleSystem.maxLifeTime = 0.25;
+        particleSystem.minLifeTime = 0.25;
+        particleSystem.maxLifeTime = 0.45;
 
         // Emission rate
-        particleSystem.emitRate = 1500;
+        particleSystem.emitRate = 2000;
 
         // Set the gravity of all particles
         particleSystem.gravity = new BABYLON.Vector3(0, 4, 0);
 
         // Direction of each particle after it has been emitted
-        particleSystem.direction1 = new BABYLON.Vector3(-7, 8, 3);
-        particleSystem.direction2 = new BABYLON.Vector3(7, 8, -3);
+        particleSystem.direction1 = new BABYLON.Vector3(-3, 0, 3);
+        particleSystem.direction2 = new BABYLON.Vector3(3, 0, -3);
+        particleSystem.direction4 = new BABYLON.Vector3(-3, 0, -3);
+        particleSystem.direction3 = new BABYLON.Vector3(3, 0, 3);
+
 
         // Angular speed, in radians
         particleSystem.minAngularSpeed = 0;
         particleSystem.maxAngularSpeed = 2*Math.PI;
 
         // Speed
-        particleSystem.minEmitPower = 1;
-        particleSystem.maxEmitPower = 3;
+        particleSystem.minEmitPower = 7;
+        particleSystem.maxEmitPower = 15;
         particleSystem.updateSpeed = 0.05;
 
         // Start the particle system
