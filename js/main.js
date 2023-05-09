@@ -683,6 +683,74 @@ function createTank(scene) {
             this.canForceShield = true;
         }, 1000 * this.forceShieldAfter);
 
+
+
+
+
+
+
+        // particules for the animation of the death of the tank
+        // Create a particle system
+        let particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+
+        //Texture of each particle
+        particleSystem.particleTexture = new BABYLON.Texture("./images/red_flare.jpg", scene);
+
+        // Where the particles come from
+        particleSystem.emitter = tank.position; // the starting position
+        particleSystem.minEmitBox = new BABYLON.Vector3(-1, -1, -1); // Bottom Left Front
+        particleSystem.maxEmitBox = new BABYLON.Vector3(1, 1, 1); // Top Right Back
+
+        // Colors of all particles
+        particleSystem.color1 = new BABYLON.Color4(0.9, 0.9, 0.5, 1.0);
+        particleSystem.color2 = new BABYLON.Color4(0.2, 0.5, 1.0, 1.0);
+        particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+
+        // Size of each particle (random between...
+        particleSystem.minSize = 0.1;
+        particleSystem.maxSize = 0.5;
+
+        // Life time of each particle (random between...
+        particleSystem.minLifeTime = 0.15;
+        particleSystem.maxLifeTime = 0.25;
+
+        // Emission rate
+        particleSystem.emitRate = 1500;
+
+        // Set the gravity of all particles
+        particleSystem.gravity = new BABYLON.Vector3(0, 4, 0);
+
+        // Direction of each particle after it has been emitted
+        particleSystem.direction1 = new BABYLON.Vector3(-7, 8, 3);
+        particleSystem.direction2 = new BABYLON.Vector3(7, 8, -3);
+
+        // Angular speed, in radians
+        particleSystem.minAngularSpeed = 0;
+        particleSystem.maxAngularSpeed = 2*Math.PI;
+
+        // Speed
+        particleSystem.minEmitPower = 1;
+        particleSystem.maxEmitPower = 3;
+        particleSystem.updateSpeed = 0.05;
+
+        // Start the particle system
+        particleSystem.start();
+
+        // stop the particle system after 3 seconds
+        setTimeout(() => {
+            particleSystem.stop();
+        }, 250);
+
+
+
+
+        
+
+        
+        let sound = new BABYLON.Sound("forceshield", "sounds/power-down-shield.mp3", scene, function () {
+            sound.play();
+        });
+
         // Loop through all the meshes in the scene and check if they intersect with the circle
         let nb_touched = 0
         for (let i = 0; i < scene.meshes.length; i++) {
