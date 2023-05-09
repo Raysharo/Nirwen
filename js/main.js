@@ -36,6 +36,7 @@ function startGame() {
         tank.fireCannonBalls(); // will fire only if space is pressed !
         tank.iceCannonBalls();
         tank.fireLasers();      // will fire only if l is pressed !
+        tank.forceshield();
 
         //moveHeroDude();
         moveOtherDudes();
@@ -58,7 +59,7 @@ function createScene() {
     console.log(pt_fixe)
     console.log(tank)
     // second parameter is the target to follow
-    let followCamera = createFollowCamera(scene, pt_fixe);
+    let followCamera = createFollowCameraV1(scene, pt_fixe);
     scene.activeCamera = followCamera;
 
     createLights(scene);
@@ -302,21 +303,6 @@ function createTank(scene) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // //////////////////////////////////
 
     // to avoid firing too many cannonball rapidly
@@ -451,6 +437,71 @@ function createTank(scene) {
 
     }
 
+
+
+
+
+    // FORCESHIELD
+
+    // to avoid firing too many cannonball rapidly
+    tank.canForceShield = true;
+    tank.forceShieldAfter = 1,5; // in seconds
+
+    // Define the radius of the circle
+    let radius = 20; // For example, 5 units
+    // Define the maximum impulse strength to apply
+    let maxImpulse =0.1; // For example, 10 units per second
+
+    
+
+    tank.forceshield = function () {
+        
+        // is the l key pressed ?
+        if (!inputStates.forceshield) return;
+        if (!this.canForceShield) return;
+
+        // ok, we fire, let's put the above property to false
+        this.canForceShield = false;
+
+        // let's be able to fire again after a while
+        setTimeout(() => {
+            this.canForceShield = true;
+        }, 1000 * this.forceShieldAfter);
+
+        // Loop through all the meshes in the scene and check if they intersect with the circle
+        let nb_touched = 0
+        for (let i = 0; i < scene.meshes.length; i++) {
+            
+            let mesh = scene.meshes[i];
+            let origin = tank.position
+            let distance = BABYLON.Vector3.Distance(mesh.position, origin);
+            // différencier le tank
+            // && mesh.name != tank.name && mesh.name != "cam_lock"
+            let ignore = ["gdhm", "cam_lock", "heroTank"]
+
+            if(distance < radius && !ignore.includes(mesh.name)){
+                // TODO : les dudes sont composé de plusieurs meshe --> caca
+                console.log(mesh.name)
+                nb_touched ++
+                let impulseStrength = maxImpulse * (1 - distance / radius);
+                // Apply an impulse to the mesh in the direction of the center of the circle
+                let direction = origin.subtract(mesh.position).normalize();
+                let force = direction.scale(impulseStrength)
+                console.log("Force = ", force)
+                let pos_boundingBox = mesh.getBoundingInfo().boundingBox.centerWorld
+                //console.log("pos_boundingBox = ", pos_boundingBox)
+
+
+                mesh.translate(force , 200)
+                //mesh.applyImpulse(force, pos_boundingBox);
+
+            }
+        }
+        console.log("Nb_touched = " + nb_touched)
+
+    }
+
+
     return tank;
 }
 
@@ -485,7 +536,7 @@ function createHeroDude(scene) {
 
         // make clones
         scene.dudes = [];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 0; i++) {
             scene.dudes[i] = doClone(heroDude, skeletons, i);
             scene.beginAnimation(scene.dudes[i].skeleton, 0, 120, true, 1);
 
@@ -588,6 +639,7 @@ function modifySettings() {
     inputStates.laser = false;
 
     inputStates.ice = false;
+    inputStates.forceshield = false;
 
 
     //add the listener to the main, window object, and update the states
@@ -607,6 +659,9 @@ function modifySettings() {
         } else if ((event.key === "i") || (event.key === "I")) {
             inputStates.ice = true;
         }
+        else if ((event.key === "f") || (event.key === "F")) {
+            inputStates.forceshield = true;
+        } 
     }, false);
 
     //if the key will be released, change the states object 
@@ -625,7 +680,9 @@ function modifySettings() {
             inputStates.laser = false;
         } else if ((event.key === "i") || (event.key === "I")) {
             inputStates.ice = false;
-        }
+        } else if ((event.key === "f") || (event.key === "F")) {
+            inputStates.forceshield = false;
+        } 
 
     }, false);
 }
