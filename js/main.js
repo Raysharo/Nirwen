@@ -331,10 +331,69 @@ function createTank(scene) {
                     }
                 ));
             });
+
+            
+            // ice particles
+
+
+            // particules for the animation of the death of the tank
+            // Create a particle system
+            let particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+
+            //Texture of each particle
+            particleSystem.particleTexture = new BABYLON.Texture("./images/blue_flare.jpg", scene);
+
+            // Where the particles come from
+            particleSystem.emitter = iceballs[i].position; // the starting position
+            particleSystem.minEmitBox = new BABYLON.Vector3(-1, -1, -1); // Bottom Left Front
+            particleSystem.maxEmitBox = new BABYLON.Vector3(1, 1, 1); // Top Right Back
+
+            // Colors of all particles
+            particleSystem.color1 = new BABYLON.Color4(0.8, 0.8, 1.0, 1.0);
+            particleSystem.color2 = new BABYLON.Color4(0.4, 0.4, 1.0, 1.0);
+            particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.0, 0.5);
+
+            // Size of each particle (random between...
+            particleSystem.minSize = 0.1;
+            particleSystem.maxSize = 0.5;
+
+            // Life time of each particle (random between...
+            particleSystem.minLifeTime = 0.05;
+            particleSystem.maxLifeTime = 0.1;
+
+            // Emission rate
+            particleSystem.emitRate = 1500;
+
+            // Set the gravity of all particles
+            particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+            // Direction of each particle after it has been emitted
+            particleSystem.direction1 = new BABYLON.Vector3(-7, 8, 3);
+            particleSystem.direction2 = new BABYLON.Vector3(7, 8, -3);
+
+            // Angular speed, in radians
+            particleSystem.minAngularSpeed = 0;
+            particleSystem.maxAngularSpeed = Math.PI;
+
+            // Speed
+            particleSystem.minEmitPower = 1;
+            particleSystem.maxEmitPower = 3;
+            particleSystem.updateSpeed = 0.005;
+
+            // Start the particle system
+            particleSystem.start();
+
+
+
+
+
+
+
             
             setTimeout(() => {
                 clearInterval(moveId);
                 iceballs[i].dispose();
+                particleSystem.stop();
             }, duration);
 
         }
@@ -494,6 +553,7 @@ function createTank(scene) {
                 sound.play();
             });
 
+
             // particules for the animation of the death of the tank
             // Create a particle system
             let particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
@@ -608,7 +668,7 @@ function createTank(scene) {
             if(distance < radius && !ignore.includes(mesh.name)){
                 // TODO : les dudes sont composé de plusieurs meshe --> caca
                 console.log(mesh.name)
-                nb_touched ++
+                nb_touched++
                 let impulseStrength = maxImpulse * (1 - distance / radius);
                 // Apply an impulse to the mesh in the direction of the center of the circle
                 let direction = origin.subtract(mesh.position).normalize();
@@ -629,6 +689,10 @@ function createTank(scene) {
 
 
     return tank;
+}
+
+function summonParticle(scene, position) {
+
 }
 
 function create_room(scene) {
