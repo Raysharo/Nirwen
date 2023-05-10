@@ -1,4 +1,9 @@
 import Dude from "./Dude.js";
+// import Obstacles from "./Obstacles.js";
+import Level from "./Level.js";
+
+let level=new Level(10,5,1,11,300)
+level.generate_grid()
 
 let canvas;
 let engine;
@@ -33,6 +38,22 @@ function startGame() {
     init_music(scene)
 
     summonEntity(scene, "mutant");
+
+    let walls=[];
+    let portes=[];
+    
+    level.room.forEach(m => {
+        createwall(scene,m)
+    });
+
+    for (let i = 0; i< level.walls.length; i++) {
+        walls[i]=scene.getMeshByName("wall_"+i);
+    }
+    for (let i = 0; i< level.walls.length; i++) {
+        portes[i]=scene.getMeshByName("wallCollider"+ i + "door");
+    }
+    portes=portes.filter(elements => {return elements !== null;});
+
     
 
     engine.runRenderLoop(() => {
@@ -53,6 +74,10 @@ function startGame() {
         // le asset loader marche pas 
         let ori = scene.getMeshByName("ori");
         if (ori != null) ori.asTank();
+
+        walls.forEach(m => {
+            m.update(pt_fixe);
+        });
 
         scene.render();
     });
@@ -97,7 +122,12 @@ function summonEntity(scene, entity_name, coord_x = 0, coord_y = 0, coord_z = 0)
         let entity = newMeshes[0];
         entity.position = new BABYLON.Vector3(coord_x, coord_y, coord_z);
         entity.name = entity_name + "_" + entities[entity_name].count++ ;
+        if(entity_name == "mutant"){
+            entity.rotation.x = -Math.PI / 2;
+            entity.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        }
         console.log("Spawning :", entity.name);
+
     });
 
 }
@@ -212,8 +242,8 @@ function createFollowCameraV1(scene, target) {
     console.log(target)
     let camera = new BABYLON.FollowCamera("tankFollowCamera", target.position, scene, target);
 
-    camera.radius = 200; // how far from the object to follow
-    camera.heightOffset = 100; // how high above the object to place the camera
+    camera.radius = 150; // how far from the object to follow
+    camera.heightOffset = 75; // how high above the object to place the camera
     camera.rotationOffset = 135; // the viewing angle
     camera.cameraAcceleration = .1; // how fast to move
     camera.maxCameraSpeed = 5; // speed limit
@@ -270,6 +300,102 @@ function importOri(scene) {
 
     assetsManager.load();
 }
+
+
+
+
+
+
+
+function createwall(scene,[x,z,index_wall,rotation,room_size,doors]){
+    
+
+    var wall = BABYLON.MeshBuilder.CreateBox("wall_" + (index_wall), {width: room_size, height: 1000 ,depth:10}, scene);
+    wall.position = new BABYLON.Vector3(x, 0, z);
+    if (doors){
+    var wallCollider_left = BABYLON.MeshBuilder.CreateBox("wallCollider"+ (index_wall) + "left", {width: room_size/2-25, height: 50, depth: 15}, scene);
+    var wallCollider_right= BABYLON.MeshBuilder.CreateBox("wallCollider"+ (index_wall) + "right", {width: room_size/2-25, height: 50, depth: 15}, scene);
+    var wallCollider_door = BABYLON.MeshBuilder.CreateBox("wallCollider"+ (index_wall) + "door", {width: 50, height: 50, depth: 15}, scene);
+    wallCollider_left.isVisible = false;
+    wallCollider_right.isVisible = false;
+    wallCollider_door.isVisible = true;
+
+
+    if (!rotation){
+        wallCollider_left.position = new BABYLON.Vector3(x, 0, (z-(room_size/4+12.5)) );
+        wallCollider_right.position = new BABYLON.Vector3(x, 0, (z+(room_size/4+12.5)) );
+        wallCollider_door.position = new BABYLON.Vector3(x, 0, z);
+    }
+    else{
+        wallCollider_left.position = new BABYLON.Vector3(x-(room_size/4+12.5), 0,z);
+        wallCollider_right.position = new BABYLON.Vector3(x+(room_size/4+12.5), 0,z);
+        wallCollider_door.position = new BABYLON.Vector3(x, 0, z);
+    }
+
+
+    if (!rotation){
+        wall.rotation = new BABYLON.Vector3(0 , Math.PI / 2 , 0);
+        wallCollider_left.rotation=wall.rotation
+        wallCollider_right.rotation=wall.rotation
+        wallCollider_door.rotation=wall.rotation
+    }
+    wallCollider_left.checkCollisions=true;
+    wallCollider_right.checkCollisions=true;
+    wallCollider_door.checkCollisions=false;
+    }
+    else{
+        var wallCollider = BABYLON.MeshBuilder.CreateBox("wall_" + (index_wall), {width: room_size, height: 1000 ,depth:10}, scene);
+        wallCollider.isVisible = false;
+        wallCollider.position=wall.position;
+        wallCollider.checkCollisions=true;
+        if (!rotation){
+            wall.rotation = new BABYLON.Vector3(0 , Math.PI / 2 , 0);
+            wallCollider.rotation=wall.rotation
+        }
+    }
+    // Appliquer une texture au mur
+    var wallMaterial = new BABYLON.StandardMaterial("wallMaterial", scene);
+    wallMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+    wallMaterial.specularColor = new BABYLON.Color3(0.5, 0.6, 0.87);
+    wallMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+    wallMaterial.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
+    wall.material = wallMaterial;
+
+
+    // Faire en sorte que le mur ne soit pas visible de l'autre côté
+    wall.material.backFaceCulling = false;
+    if (rotation){
+        wall.update = (pt_fixe) => {
+            if (pt_fixe.position.z>wall.position.z ){
+                wall.isVisible=false
+            }
+            else {
+                wall.isVisible=true
+            }
+        }
+    }else{
+        wall.update = (pt_fixe) => {
+            if (pt_fixe.position.x<wall.position.x){
+                wall.isVisible=false
+            }
+            else {
+                wall.isVisible=true
+            }
+        }
+    }
+    index_wall++;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
