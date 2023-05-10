@@ -37,7 +37,7 @@ function startGame() {
 
     init_music(scene)
 
-    summonEntity(scene, "mutant");
+    summonEntity(scene, "mutant", 50 ,0, 50);
 
     let walls=[];
     let portes=[];
@@ -114,19 +114,27 @@ var entities = {
 
 function summonEntity(scene, entity_name, coord_x = 0, coord_y = 0, coord_z = 0){
 
-    console.log("entity_name ", entity_name)
-    console.log("entities[entity_name].dir", entities[entity_name].dir)
-    console.log("entities[entity_name].file", entities[entity_name].file)
+    // console.log("entity_name ", entity_name)
+    // console.log("entities[entity_name].dir", entities[entity_name].dir)
+    // console.log("entities[entity_name].file", entities[entity_name].file)
 
     BABYLON.SceneLoader.ImportMesh("", entities[entity_name].dir, entities[entity_name].file, scene, function (newMeshes) {
         let entity = newMeshes[0];
         entity.position = new BABYLON.Vector3(coord_x, coord_y, coord_z);
         entity.name = entity_name + "_" + entities[entity_name].count++ ;
+        
         if(entity_name == "mutant"){
             entity.rotation.x = -Math.PI / 2;
             entity.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         }
+        
         console.log("Spawning :", entity.name);
+
+        let coucouMonsieur = new Dude(entity, entity.name, 0.7, 0.5 , scene);
+        console.log("monsieur :", coucouMonsieur)
+        scene.dudes.push(entity);
+        console.log("scene.dudes",scene.dudes)
+
 
     });
 
@@ -287,27 +295,6 @@ function create_pt_fixe_camera(scene) {
 }
 
 let zMovement = 5;
-
-
-function importOri(scene) {
-    const assetsManager = new BABYLON.AssetsManager(scene);
-
-    const meshTask = assetsManager.addMeshTask("Ori", "./models/Ori/", "ori.babylon");
-
-    meshTask.onSuccess = function (task) {
-        let ori = task.loadedMeshes[0];
-        ori.position = new BABYLON.Vector3(0, 2, 0);
-        ori.scaling = new BABYLON.Vector3(2, 2, 2);
-        ori.name = "ori";
-        ori.isVisible = true;
-    };
-
-    meshTask.onError = function (task, message, exception) {
-        console.log(message, exception);
-    };
-
-    assetsManager.load();
-}
 
 
 
@@ -1088,7 +1075,8 @@ function moveHeroDude() {
 function moveOtherDudes() {
     if (scene.dudes) {
         for (var i = 0; i < scene.dudes.length; i++) {
-            scene.dudes[i].Dude.move(scene);
+            if(scene.dudes[i].Dude != undefined) scene.dudes[i].Dude.move(scene);
+            
         }
     }
 }
