@@ -190,6 +190,14 @@ function createScene() {
         createwall(scene,m)
     });
 
+    level.room.forEach(element => {
+        for (let index = 0; index < element.Tab_ennemies.length; index++) {
+            let x,z,state;
+            [x,z,state]=element.Tab_ennemies[index];
+            summonEntity(scene,"mutant",x,1,z)
+        }
+    });
+
 
     return scene;
 }

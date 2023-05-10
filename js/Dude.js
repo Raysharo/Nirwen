@@ -96,6 +96,8 @@ export default class Dude {
         bounder.material = bounderMaterial;
         bounder.checkCollisions = true;
 
+        bounder.isVisible = false;
+
         bounder.position = this.dudeMesh.position.clone();
 
         let bbInfo = Dude.boundingBoxParameters;
