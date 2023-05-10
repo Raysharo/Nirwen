@@ -32,7 +32,7 @@ function startGame() {
 
     init_music(scene)
 
-
+    summonEntity(scene, "ice_pick");
 
     engine.runRenderLoop(() => {
         let deltaTime = engine.getDeltaTime(); // remind you something ?
@@ -48,19 +48,53 @@ function startGame() {
         //moveHeroDude();
         moveOtherDudes();
 
+        // attention ça pique les yeux.
+        // le asset loader marche pas 
         let ori = scene.getMeshByName("ori");
-        if (ori != null) {
-            ori.position = tank.position;
-            ori.rotation.x = -Math.PI / 2;;
-            ori.rotation.y = tank.rotation.y - Math.PI;
-            ori.rotation.z = tank.rotation.z;
-
-
-        }
-
+        if (ori != null) ori.asTank();
 
         scene.render();
     });
+}
+var entities = {
+    "troll": {
+        "dir": "./models/Troll/",
+        "file": "troll.babylonjs",
+        "count": 0
+    },
+    "skeleton": {
+        "dir": "./models/Skeleton/",
+        "file": "skeleton.babylon.js",
+        "count": 0
+    },
+    "mutant": {
+        "dir": "./models/Mutant/",
+        "file": "mutant.babylon.js",
+        "count": 0
+    },
+    "ice_pick" : {
+        "dir": "models/ice_pick/",
+        "file": "Ice_Spick.babylon",
+        "count": 0
+    }
+};
+
+
+function summonEntity(scene, entity_name, coord_x = 0, coord_y = 0, coord_z = 0){
+    BABYLON.SceneLoader.ImportMesh("", entities[entity_name].dir, entities[entity_name].file, scene, function (newMeshes) {
+        console.log("FLAG 0");
+        let entity = newMeshes[0];
+        /*
+        console.log("FLAG 1");
+        entity.name = entity_name +  entities[entity_name].count;
+        // Make sure that the name is unique
+
+        entities[entity_name].count++;
+        entity.position = new BABYLON.Vector3(coord_x, coord_y, coord_z); 
+        entity.isVisible = true;
+        entity.scaling = new BABYLON.Vector3(2,2,2);
+        */
+    })
 }
 
 function init_music(scene) {
@@ -236,16 +270,23 @@ function importOri(scene) {
 
 function createTank(scene) {
 
-    // importOri(scene);
     let tankBis = scene.getMeshByName("ori");
 
 
-    BABYLON.SceneLoader.ImportMesh("", "models/prin/", "oriTPose.babylon", scene, function (newMeshes) {
+    BABYLON.SceneLoader.ImportMesh("Ori", "models/prin/", "oriTPose.babylon", scene, function (newMeshes) {
         let ori = newMeshes[0];
         ori.position = new BABYLON.Vector3(0, 2, 0);
         ori.scaling = new BABYLON.Vector3(2, 2, 2);
         ori.name = "ori";
         ori.isVisible = true;
+        ori.asTank = function () {
+            // tp
+            ori.position = tank.position;
+            // position verticcal
+            ori.rotation.x = -Math.PI / 2;;
+            ori.rotation.y = tank.rotation.y - Math.PI;
+            ori.rotation.z = tank.rotation.z;
+        };
     })
 
 
@@ -685,7 +726,7 @@ function createTank(scene) {
     tank.forceShieldAfter = 1, 5; // in seconds
 
     // Define the radius of the circle
-    let radius = 20; // For example, 5 units
+    let radius = 50; // For example, 5 units
     // Define the maximum impulse strength to apply
     let maxImpulse = 0.1; // For example, 10 units per second
 
