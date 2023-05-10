@@ -18,8 +18,8 @@ export default class Level {
         this.walls=[]
         this.room=[]
         this.roomdata=[]
-    }
-    
+    }   // un level est caratérisé par une Grille contenant un nombre de salle aléatoire entre salle_max et salle_min , il possède aussi un niveau (ID) et la taille d'une salle (pour les differents calculs)
+    // on va calculer (et stoker) dans cette structures les points clefs pour stockers des murs, mais aussi les salles de type ROOM , et les données d'une salle (les mesh des murs regroupé par 4) dans room data
     generate_grid() {
         // Calculer les coordonnées du centre de la grille
         const center_x = Math.floor(this.grid_size / 2);
@@ -98,22 +98,22 @@ export default class Level {
         console.log(nb_salle_generees)
     }
 
-    build_level(){
+    build_level(){ //On va construire ici un tableau qui va nous permettre la constructions des murs respective a chaque salle
         let index_wall=0
         let walls=[]
-        const center = Math.floor(this.grid_size / 2);
+        const center = Math.floor(this.grid_size / 2); //On prend de la grille comme le centre de la base de calcul (0,0)
         for (let x = 0; x < this.grid_size; x++) {
             for (let y = 0; y < this.grid_size; y++) {
                 if (this.grid[x][y] !== 0){
-                    let center_room_x=(y-center)*this.room_size;
-                    let center_room_z=((-1)*(x-center))*this.room_size;
-                    let x1= center_room_x + this.room_size/2;
-                    let x2= center_room_x - this.room_size/2;
-                    let x_c= center_room_x;
-                    let z1= center_room_z + this.room_size/2;
-                    let z2= center_room_z - this.room_size/2;
-                    let z_c= center_room_z;
-                    let doors=[];
+                    let center_room_x=(y-center)*this.room_size;        //calcul du centre d'une pièce (en X)
+                    let center_room_z=((-1)*(x-center))*this.room_size; //calcul du centre d'une pièce (en Z)
+                    let x1= center_room_x + this.room_size/2;           //calcul du centre du mur du haut pièce (en X)
+                    let x2= center_room_x - this.room_size/2;           //calcul du centre du mur du bas (en X)
+                    let x_c= center_room_x;                             //calcul du centre des mur lateraux (en X)
+                    let z1= center_room_z + this.room_size/2;           //calcul du centre du mur du haut pièce (en Z)
+                    let z2= center_room_z - this.room_size/2;           //calcul du centre du mur du bas (en Z)
+                    let z_c= center_room_z;                             //calcul du centre du mur du haut pièce (en Z)
+                    let doors=[];                                       //tableau des portes a afficher dans la salle
                     if (this.grid[x-1][y] === 1){
                         doors.push("top")
                     }
@@ -127,7 +127,7 @@ export default class Level {
                         doors.push("left")
                     }
                     console.log(doors)
-                    let tmp =create_murs(this.room_size,x1,x2,x_c,z1,z2,z_c,index_wall,doors);
+                    let tmp =create_murs(this.room_size,x1,x2,x_c,z1,z2,z_c,index_wall,doors);  //on va simplifier les données pour creer un tableau que l'on va mettre dans notre main pour creer des murs
                     tmp.forEach(m => {
                         walls.push(m)
                     });
@@ -148,19 +148,19 @@ export default class Level {
                 tmp=[]
             }  
         }
-        this.roomdata=tmp_bis;
-        tmp_bis.forEach(element => {
+        this.roomdata=tmp_bis;             //creations du regroupement de 4 murs 
+        tmp_bis.forEach(element => {    //creations des differentes room avec le regroupement de 4 murs 
             if (element[2][0]===0 && element[0][1]===0){
-                rooms.push(new Room(element,rooms.length,[],[],true,true))
+                rooms.push(new Room(element,rooms.length,[],[],true,true))  //si c'est la salle de départ alors il n'y a pas de monstres
             }
             else {
-                rooms.push(new Room(element,rooms.length,[],[],false,false))
+                rooms.push(new Room(element,rooms.length,[],[],false,false)) //sinon il y a des monstres
             }
         });
         this.room=rooms;
     }
 
-    randomize_ennemy_spawn(){
+    randomize_ennemy_spawn(){       //affecte au tableau d'ennemies aleatoire une piece 
         this.room.forEach(element => {
             if (element.clear_state==false){
                 element.random_ennemies()
@@ -170,7 +170,7 @@ export default class Level {
 }
 
 function create_murs(room_size,x1,x2,x_c,z1,z2,z_c,index_wall,doors){
-    // Créer un objet plan (plane)
+    // fonction qui Parse les données et les simplifie
     let walls=[]
     let x=0;
     let z=0;

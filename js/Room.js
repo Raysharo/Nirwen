@@ -1,20 +1,20 @@
 
 export default class Room {
     constructor(mur_tab, id_room, Tab_ennemies, Tab_obstacles,clear_state,in_room) {
-        this.x_max=mur_tab[0][0];
-        this.z_max=mur_tab[2][1];
-        this.x_min=mur_tab[1][0];
-        this.z_min=mur_tab[3][1];
-        this.id_room=id_room;
-        this.clear_state=clear_state;
-        this.Tab_ennemies =Tab_ennemies;
-        this.Tab_obstacles=Tab_obstacles;
-        this.in_room=in_room
-        this.doors=[]
-    }
+        this.x_max=mur_tab[0][0];   //coordonnèes x
+        this.z_max=mur_tab[2][1];   //coordonnèes z
+        this.x_min=mur_tab[1][0];   //coordonnèes x
+        this.z_min=mur_tab[3][1];   //coordonnèes z
+        this.id_room=id_room;       //identifiant de la salle
+        this.clear_state=clear_state;   //la salle possède t'elle encore des ennemies ? (valeur boolean) sert a la fermeture des portes (non implemanté)
+        this.Tab_ennemies =Tab_ennemies;    //Tableau des ennemies (Vide par defaut)
+        this.Tab_obstacles=Tab_obstacles;   //Tableau des obstacles (Non implemanté pour l'instant)
+        this.in_room=in_room            //Boolean indicant si le joueur est dans la salle
+        this.doors=[]                   //mesh des differentes portes
+    }   //une salle est caractérisé par ces coordonnèes x et z ainsi que son identifiant et son status 
     
-    random_ennemies() {
-        const layout = Math.floor(Math.random() * 3 + 1);
+    random_ennemies() { //Donne un layout aléatoire d'adversaires
+        const layout = Math.floor(Math.random() * 3 + 1); // 
         let set=[]
         switch (layout) {
             case 1:
@@ -26,7 +26,7 @@ export default class Room {
                 let z3=this.z_max - 20;
                 let x4=this.x_min + 20;
                 let z4=this.z_min + 20;
-                set.push([x1,z1,true,this.id_room],[x2,z2,true,this.id_room],[x3,z3,true,this.id_room],[x4,z4,true,this.id_room]);
+                set.push([x1,z1,true,this.id_room],[x2,z2,true,this.id_room],[x3,z3,true,this.id_room],[x4,z4,true,this.id_room]); //les adversaires sont décrit par des coordonnées x,y et l'id de la salle a la quelle il appartiennent
                 break;
             case 2:
                 let x_1=(this.x_max + this.x_min)/2;
@@ -57,7 +57,7 @@ export default class Room {
         }
         this.Tab_ennemies=set
     }
-    caracter_in_room(pt_fixe){
+    caracter_in_room(pt_fixe){      //actualise la presence du personnage dans la salle
         if (pt_fixe.position.x<this.x_max+5 && pt_fixe.position.x>this.x_min-5 && pt_fixe.position.z<this.z_max+5 && pt_fixe.position.z>this.z_min-5){
             this.in_room=true
         }

@@ -59,9 +59,9 @@ function startGame() {
         let deltaTime = engine.getDeltaTime(); // remind you something ?
 
         tank.move(pt_fixe);
-        tank.fireCannonBalls(); // will fire only if space is pressed !
+        //tank.fireCannonBalls(); // will fire only if space is pressed !
         tank.iceCannonBalls();
-        tank.fireLasers();      // will fire only if l is pressed !
+        //tank.fireLasers();      // will fire only if l is pressed !
         tank.forceshield();
 
 
@@ -415,12 +415,7 @@ function createTank(scene) {
 
     let tank = new BABYLON.MeshBuilder.CreateBox("heroTank", { height: 1, depth: 6, width: 6 }, scene);
     tank.isVisible = false;
-    /*let tankMaterial = new BABYLON.StandardMaterial("tankMaterial", scene);
-    
-    tankMaterial.diffuseColor = new BABYLON.Color3.Red;
-    tankMaterial.emissiveColor = new BABYLON.Color3.Blue;
-    tank.material = tankMaterial;
-    */
+   
     // tank cannot be picked by rays, but tank will not be pickable by any ray from other
     // players.... !
     //tank.isPickable = false; 
