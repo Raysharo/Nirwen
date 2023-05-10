@@ -1,10 +1,10 @@
-# NIRWEN : a 3DGames with BabylonJS for Games On Web 2023 
+# NIRWEN : a 3D Rogue Like games
 ## Lucas LYON, Mohamed MAHJOUB
 
 Thème : *Be green*
 
 # Description :
-Nirwen est un Rogue Like en vue isométrique suivante.
+Nirwen est un Rogue Like en vue isométrique suivante, créer avec BabylonJS à l'occasion du concours *Games On Web 2023*
 Le joueur incarne "Ori", un être magique aux sorts multiple et se rendant plus impressionnant devant ses ennemis en écartant les bras. Très craintif, il est très rare de les voir repliés.
 Celui-ci se défend contre ses ennemis, les terribles mutants, en envoyant des valses de pics de glace. En cas de trop forte proximité, celui-ci peut utiliser un forceshield, un puissant pouvoir repoussant ses adversaires.
 
