@@ -4,7 +4,7 @@ import Level from "./Level.js";
 
 let level=new Level(10,5,1,11,300)
 level.generate_grid()
-
+console.log(level.grid)
 let canvas;
 let engine;
 let scene;
@@ -42,7 +42,7 @@ function startGame() {
     let walls=[];
     let portes=[];
     
-    level.room.forEach(m => {
+    level.roomdata.forEach(m => {
         createwall(scene,m)
     });
 
@@ -175,6 +175,14 @@ function createScene() {
 
     createIcePick(scene);
 
+    level.build_level();
+    level.randomize_ennemy_spawn();
+    let walls = level.walls;
+    walls.forEach(m => {
+        createwall(scene,m)
+    });
+
+
     return scene;
 }
 
@@ -191,7 +199,7 @@ function createIcePick(scene) {
 }
 
 function createGround(scene) {
-    const groundOptions = { width: 2000, height: 2000, subdivisions: 20, minHeight: 0, maxHeight: 100, onReady: onGroundCreated };
+    const groundOptions = { width: 20000, height: 20000, subdivisions: 20, minHeight: 0, maxHeight: 100, onReady: onGroundCreated };
     //scene is optional and defaults to the current scene
     const ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap("gdhm", 'images/hmap1.png', groundOptions, scene);
 

@@ -17,6 +17,7 @@ export default class Level {
         this.grid=grid;
         this.walls=[]
         this.room=[]
+        this.roomdata=[]
     }
     
     generate_grid() {
@@ -147,7 +148,7 @@ export default class Level {
                 tmp=[]
             }  
         }
-
+        this.roomdata=tmp_bis;
         tmp_bis.forEach(element => {
             if (element[2][0]===0 && element[0][1]===0){
                 rooms.push(new Room(element,rooms.length,[],[],true,true))
