@@ -32,7 +32,8 @@ function startGame() {
 
     init_music(scene)
 
-    summonEntity(scene, "ice_pick");
+    summonEntity(scene, "mutant");
+    
 
     engine.runRenderLoop(() => {
         let deltaTime = engine.getDeltaTime(); // remind you something ?
@@ -58,43 +59,47 @@ function startGame() {
 }
 var entities = {
     "troll": {
-        "dir": "./models/Troll/",
-        "file": "troll.babylonjs",
+        "dir": "models/Troll/",
+        "file": "troll.babylon",
         "count": 0
     },
     "skeleton": {
-        "dir": "./models/Skeleton/",
-        "file": "skeleton.babylon.js",
+        "dir": "models/Skeleton/",
+        "file": "skeleton.babylon",
         "count": 0
     },
     "mutant": {
-        "dir": "./models/Mutant/",
-        "file": "mutant.babylon.js",
+        "dir": "models/Mutant/",
+        "file": "mutant.babylon",
         "count": 0
     },
     "ice_pick" : {
-        "dir": "models/ice_pick/",
-        "file": "Ice_Spick.babylon",
+        "dir": " models/ice_pick/",
+        "file": "Ice_Spike.babylon",
+        "count": 0
+    },
+    "ori" : {
+        "dir": "models/Ori/",
+        "file": "Ori.babylon",
         "count": 0
     }
+
 };
 
 
 function summonEntity(scene, entity_name, coord_x = 0, coord_y = 0, coord_z = 0){
-    BABYLON.SceneLoader.ImportMesh("", entities[entity_name].dir, entities[entity_name].file, scene, function (newMeshes) {
-        console.log("FLAG 0");
-        let entity = newMeshes[0];
-        /*
-        console.log("FLAG 1");
-        entity.name = entity_name +  entities[entity_name].count;
-        // Make sure that the name is unique
 
-        entities[entity_name].count++;
-        entity.position = new BABYLON.Vector3(coord_x, coord_y, coord_z); 
-        entity.isVisible = true;
-        entity.scaling = new BABYLON.Vector3(2,2,2);
-        */
-    })
+    console.log("entity_name ", entity_name)
+    console.log("entities[entity_name].dir", entities[entity_name].dir)
+    console.log("entities[entity_name].file", entities[entity_name].file)
+
+    BABYLON.SceneLoader.ImportMesh("", entities[entity_name].dir, entities[entity_name].file, scene, function (newMeshes) {
+        let entity = newMeshes[0];
+        entity.position = new BABYLON.Vector3(coord_x, coord_y, coord_z);
+        entity.name = entity_name + "_" + entities[entity_name].count++ ;
+        console.log("Spawning :", entity.name);
+    });
+
 }
 
 function init_music(scene) {
@@ -249,7 +254,7 @@ let zMovement = 5;
 function importOri(scene) {
     const assetsManager = new BABYLON.AssetsManager(scene);
 
-    const meshTask = assetsManager.addMeshTask("Ori", "./models/prin/", "oriTPose.babylon");
+    const meshTask = assetsManager.addMeshTask("Ori", "./models/Ori/", "ori.babylon");
 
     meshTask.onSuccess = function (task) {
         let ori = task.loadedMeshes[0];
@@ -273,7 +278,7 @@ function createTank(scene) {
     let tankBis = scene.getMeshByName("ori");
 
 
-    BABYLON.SceneLoader.ImportMesh("Ori", "models/prin/", "oriTPose.babylon", scene, function (newMeshes) {
+    BABYLON.SceneLoader.ImportMesh("Ori", "models/Ori/", "ori.babylon", scene, function (newMeshes) {
         let ori = newMeshes[0];
         ori.position = new BABYLON.Vector3(0, 2, 0);
         ori.scaling = new BABYLON.Vector3(2, 2, 2);
