@@ -187,7 +187,7 @@ function createScene() {
     createIcePick(scene);
 
     level.build_level();
-    // level.randomize_ennemy_spawn();
+    level.randomize_ennemy_spawn();
     let walls = level.walls;
     walls.forEach(m => {
         createwall(scene,m)
