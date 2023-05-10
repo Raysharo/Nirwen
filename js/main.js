@@ -762,6 +762,8 @@ function createTank(scene) {
     tank.recoveryTime = 1 // in seconds;
     tank.isInvincible = false;
 
+
+
     tank.takeDamage = function (damage) {
         if (!inputStates.sucide || tank.isInvincible) return;
         tank.healthPoints -= damage;
@@ -852,7 +854,23 @@ function createTank(scene) {
         }
     }
 
+    /*
+    tank.contactDamage = function () {
+        for (let i = 0; i < scene.meshes.length; i++) {
 
+            let mesh = scene.meshes[i];
+            let origin = tank.position
+            let distance = BABYLON.Vector3.Distance(mesh.position, origin);
+
+            let ignore = ["gdhm", "cam_lock", "heroTank"]
+
+            if(distance <= 10 && !ignore.includes(mesh.name)){
+                console.log(mesh.name)
+                tank.takeDamage(10)
+                
+            }
+    }
+    */
     // FORCESHIELD
 
     // to avoid firing too many cannonball rapidly
