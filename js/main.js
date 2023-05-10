@@ -37,7 +37,7 @@ function startGame() {
 
     init_music(scene)
 
-    summonEntity(scene, "mutant", 50 ,0, 50);
+    summonEntity(scene, "mutant", 75 ,0, 75);
 
     let walls=[];
     let portes=[];
@@ -65,7 +65,9 @@ function startGame() {
         tank.fireLasers();      // will fire only if l is pressed !
         tank.forceshield();
 
-        tank.takeDamage(50); // debug
+
+        tank.contactDamage();
+        // tank.takeDamage(50); // debug
 
         //moveHeroDude();
         moveOtherDudes();
@@ -128,13 +130,14 @@ function summonEntity(scene, entity_name, coord_x = 0, coord_y = 0, coord_z = 0)
             entity.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         }
         
-        console.log("Spawning :", entity.name);
+        // console.log("Spawning :", entity.name);
 
-        let coucouMonsieur = new Dude(entity, entity.name, 0.7, 0.5 , scene);
-        console.log("monsieur :", coucouMonsieur)
-        scene.dudes.push(entity);
-        console.log("scene.dudes",scene.dudes)
-
+        setTimeout(() => {
+            let coucouMonsieur = new Dude(entity, entity.name, 0.7, 0.5 , scene);
+            // console.log("monsieur :", coucouMonsieur)
+            scene.dudes.push(entity);
+            // console.log("scene.dudes",scene.dudes)
+        }, 1000);
 
     });
 
@@ -184,7 +187,7 @@ function createScene() {
     createIcePick(scene);
 
     level.build_level();
-    level.randomize_ennemy_spawn();
+    // level.randomize_ennemy_spawn();
     let walls = level.walls;
     walls.forEach(m => {
         createwall(scene,m)
@@ -759,20 +762,24 @@ function createTank(scene) {
 
     // tank lose health points when hitten
     tank.healthPoints = 100
-    tank.recoveryTime = 1 // in seconds;
+    tank.recoveryTime = 3 // in seconds;
     tank.isInvincible = false;
 
 
 
     tank.takeDamage = function (damage) {
-        if (!inputStates.sucide || tank.isInvincible) return;
+        // if (!inputStates.sucide || tank.isInvincible) return;
+        
+
         tank.healthPoints -= damage;
+        console.log("Tank health points : " + tank.healthPoints)
 
         // if health points are 0, tank is destroyed
         if (tank.healthPoints <= 0) {
             // tank is destroyed
-            console.log("Tank destroyed")
-
+            console.log("Tank destroyed !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            tank.isDead = true;
+            
 
             let sound = new BABYLON.Sound("death_tank", "./sounds/tubular-bell-of-death.mp3", scene, function () {
                 sound.play();
@@ -835,6 +842,7 @@ function createTank(scene) {
             }, 500);
 
 
+
         }
         // else, tank become invincible for a while if it's not already
         else {
@@ -844,33 +852,39 @@ function createTank(scene) {
             });
             //Leave time for the sound file to load before playing it
             sound.play();
-            // lose health points
-            tank.healthPoints -= damage
+            
             // tank become invincible for a while
             tank.isInvincible = true;
             setTimeout(() => {
                 tank.isInvincible = false;
-            }, 1000 * tank.recoveryTime);
+            }, 500 * tank.recoveryTime);
         }
     }
 
-    /*
+    tank.isDead = false;
     tank.contactDamage = function () {
+        
+        // if tank is dead, no contact damage
+        if (tank.isDead || tank.isInvincible ) return;
+
         for (let i = 0; i < scene.meshes.length; i++) {
 
             let mesh = scene.meshes[i];
             let origin = tank.position
             let distance = BABYLON.Vector3.Distance(mesh.position, origin);
+            // let ignore = ["gdhm", "cam_lock", "heroTank", "ori", "wallCollider", "bounder"]
 
-            let ignore = ["gdhm", "cam_lock", "heroTank"]
-
-            if(distance <= 10 && !ignore.includes(mesh.name)){
-                console.log(mesh.name)
+            // if(distance <= 20 && !ignore.includes(mesh.name) ){
+            //     console.log("Touch by", mesh.name)
+            //     tank.takeDamage(1)
+            // }
+            if(distance <= 30 && mesh.name.includes("bounder") ){
+                console.log("Touch by", mesh.name)
                 tank.takeDamage(10)
-                
             }
+        }
     }
-    */
+    
     // FORCESHIELD
 
     // to avoid firing too many cannonball rapidly
