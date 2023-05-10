@@ -32,7 +32,7 @@ function startGame() {
 
     init_music(scene)
 
-    
+
 
     engine.runRenderLoop(() => {
         let deltaTime = engine.getDeltaTime(); // remind you something ?
@@ -48,14 +48,25 @@ function startGame() {
         //moveHeroDude();
         moveOtherDudes();
 
+        let ori = scene.getMeshByName("ori");
+        if (ori != null) {
+            ori.position = tank.position;
+            ori.rotation.x = -Math.PI / 2;;
+            ori.rotation.y = tank.rotation.y - Math.PI;
+            ori.rotation.z = tank.rotation.z;
+
+
+        }
+
+
         scene.render();
     });
 }
 
 function init_music(scene) {
-    
+
     let main_music;
-    
+
     // Load the sound and play it automatically once ready
     main_music = new BABYLON.Sound("MainMusic", "music/coniferous-forest.mp3", scene, null, {
         loop: true,
@@ -78,7 +89,7 @@ function createScene() {
     let freeCamera = createFreeCamera(scene);
 
     let pt_fixe = create_pt_fixe_camera(scene);
-    importOri(scene)
+    // importOri(scene)
     let tank = createTank(scene);
     // create_room();
 
@@ -104,7 +115,7 @@ function createIcePick(scene) {
         let ice = newMeshes[0];
         ice.position = new BABYLON.Vector3(0, 2, 0);
         ice.scaling = new BABYLON.Vector3(1, 1, 1);
-        ice.rotation = new BABYLON.Vector3(Math.PI / 2 , 0 , 0);
+        ice.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
         ice.name = "iceball";
         ice.isVisible = false;
     })
@@ -193,6 +204,7 @@ function create_pt_fixe_camera(scene) {
     pt_fixe.material = camMaterial;
     pt_fixe.position.y = 0.3;
     pt_fixe.frontVector = new BABYLON.Vector3(0, 0, 1);
+    pt_fixe.isVisible = false;
 
     return pt_fixe;
 }
@@ -200,10 +212,10 @@ function create_pt_fixe_camera(scene) {
 let zMovement = 5;
 
 
-function importOri(scene){
+function importOri(scene) {
     const assetsManager = new BABYLON.AssetsManager(scene);
 
-    const meshTask = assetsManager.addMeshTask("Ori", "models/prin/oriTPose.babylon", "oriTPose.babylon");
+    const meshTask = assetsManager.addMeshTask("Ori", "./models/prin/", "oriTPose.babylon");
 
     meshTask.onSuccess = function (task) {
         let ori = task.loadedMeshes[0];
@@ -211,11 +223,11 @@ function importOri(scene){
         ori.scaling = new BABYLON.Vector3(2, 2, 2);
         ori.name = "ori";
         ori.isVisible = true;
-      };
+    };
 
-      meshTask.onError = function (task, message, exception) {
+    meshTask.onError = function (task, message, exception) {
         console.log(message, exception);
-      };
+    };
 
     assetsManager.load();
 }
@@ -224,19 +236,29 @@ function importOri(scene){
 
 function createTank(scene) {
 
-    
     // importOri(scene);
     let tankBis = scene.getMeshByName("ori");
 
-    
+
+    BABYLON.SceneLoader.ImportMesh("", "models/prin/", "oriTPose.babylon", scene, function (newMeshes) {
+        let ori = newMeshes[0];
+        ori.position = new BABYLON.Vector3(0, 2, 0);
+        ori.scaling = new BABYLON.Vector3(2, 2, 2);
+        ori.name = "ori";
+        ori.isVisible = true;
+    })
+
+
 
 
     let tank = new BABYLON.MeshBuilder.CreateBox("heroTank", { height: 1, depth: 6, width: 6 }, scene);
-    let tankMaterial = new BABYLON.StandardMaterial("tankMaterial", scene);
+    tank.isVisible = false;
+    /*let tankMaterial = new BABYLON.StandardMaterial("tankMaterial", scene);
+    
     tankMaterial.diffuseColor = new BABYLON.Color3.Red;
     tankMaterial.emissiveColor = new BABYLON.Color3.Blue;
     tank.material = tankMaterial;
-    
+    */
     // tank cannot be picked by rays, but tank will not be pickable by any ray from other
     // players.... !
     //tank.isPickable = false; 
@@ -324,17 +346,17 @@ function createTank(scene) {
             // position the iceballs[i] above the tank
             iceballs[i].position = new BABYLON.Vector3(pos.x, pos.y + 10, pos.z);
             // rotate the iceballs[i] to face the frontVector with a small angle
-            iceballs[i].rotation.y = tank.rotation.y + ((nb_iceballs-1)/2 - i) * angle;
+            iceballs[i].rotation.y = tank.rotation.y + ((nb_iceballs - 1) / 2 - i) * angle;
             // set the frontVector of the iceballs[i] to the direction of the frontVector
             iceballs[i].frontVector = new BABYLON.Vector3(Math.sin(iceballs[i].rotation.y), 0, Math.cos(iceballs[i].rotation.y))
-            
+
             // Move the iceballs[i] in the same direction of the front vector during 3 seconds before disposing it
-        
+
             let duration = 500; // 0.5 seconds
 
             let moveId = setInterval(() => {
                 // move with collision
-                iceballs[i].moveWithCollisions(iceballs[i].frontVector.multiplyByFloats(1,1,1));
+                iceballs[i].moveWithCollisions(iceballs[i].frontVector.multiplyByFloats(1, 1, 1));
                 // iceballs[i].position.addInPlace(iceballs[i].frontVector.multiplyByFloats(1,1,1));
             }, 1);
 
@@ -358,7 +380,7 @@ function createTank(scene) {
                 ));
             });
 
-            
+
             // ice particles
 
 
@@ -415,7 +437,7 @@ function createTank(scene) {
 
 
 
-            
+
             setTimeout(() => {
                 clearInterval(moveId);
                 iceballs[i].dispose();
@@ -565,15 +587,15 @@ function createTank(scene) {
     tank.recoveryTime = 1 // in seconds;
     tank.isInvincible = false;
 
-    tank.takeDamage = function(damage) {
-        if(!inputStates.sucide || tank.isInvincible) return;
+    tank.takeDamage = function (damage) {
+        if (!inputStates.sucide || tank.isInvincible) return;
         tank.healthPoints -= damage;
-        
+
         // if health points are 0, tank is destroyed
-        if(tank.healthPoints <= 0){
+        if (tank.healthPoints <= 0) {
             // tank is destroyed
             console.log("Tank destroyed")
-            
+
 
             let sound = new BABYLON.Sound("death_tank", "./sounds/tubular-bell-of-death.mp3", scene, function () {
                 sound.play();
@@ -644,7 +666,7 @@ function createTank(scene) {
                 sound.play();
             });
             //Leave time for the sound file to load before playing it
-            sound.play();   
+            sound.play();
             // lose health points
             tank.healthPoints -= damage
             // tank become invincible for a while
@@ -660,17 +682,17 @@ function createTank(scene) {
 
     // to avoid firing too many cannonball rapidly
     tank.canForceShield = true;
-    tank.forceShieldAfter = 1,5; // in seconds
+    tank.forceShieldAfter = 1, 5; // in seconds
 
     // Define the radius of the circle
     let radius = 20; // For example, 5 units
     // Define the maximum impulse strength to apply
-    let maxImpulse =0.1; // For example, 10 units per second
+    let maxImpulse = 0.1; // For example, 10 units per second
 
-    
+
 
     tank.forceshield = function () {
-        
+
         // is the l key pressed ?
         if (!inputStates.forceshield) return;
         if (!this.canForceShield) return;
@@ -729,7 +751,7 @@ function createTank(scene) {
 
         // Angular speed, in radians
         particleSystem.minAngularSpeed = 0;
-        particleSystem.maxAngularSpeed = 2*Math.PI;
+        particleSystem.maxAngularSpeed = 2 * Math.PI;
 
         // Speed
         particleSystem.minEmitPower = 7;
@@ -747,9 +769,9 @@ function createTank(scene) {
 
 
 
-        
 
-        
+
+
         let sound = new BABYLON.Sound("forceshield", "sounds/power-down-shield.mp3", scene, function () {
             sound.play();
         });
@@ -757,7 +779,7 @@ function createTank(scene) {
         // Loop through all the meshes in the scene and check if they intersect with the circle
         let nb_touched = 0
         for (let i = 0; i < scene.meshes.length; i++) {
-            
+
             let mesh = scene.meshes[i];
             let origin = tank.position
             let distance = BABYLON.Vector3.Distance(mesh.position, origin);
@@ -765,7 +787,7 @@ function createTank(scene) {
             // && mesh.name != tank.name && mesh.name != "cam_lock"
             let ignore = ["gdhm", "cam_lock", "heroTank"]
 
-            if(distance < radius && !ignore.includes(mesh.name)){
+            if (distance < radius && !ignore.includes(mesh.name)) {
                 // TODO : les dudes sont composé de plusieurs meshe --> caca
                 console.log(mesh.name)
                 nb_touched++
@@ -778,7 +800,7 @@ function createTank(scene) {
                 //console.log("pos_boundingBox = ", pos_boundingBox)
 
 
-                mesh.translate(force , 200)
+                mesh.translate(force, 200)
                 //mesh.applyImpulse(force, pos_boundingBox);
 
             }
@@ -949,10 +971,10 @@ function modifySettings() {
         }
         else if ((event.key === "f") || (event.key === "F")) {
             inputStates.forceshield = true;
-        } 
+        }
         else if ((event.key === "k") || (event.key === "K")) {
             inputStates.sucide = true;
-        } 
+        }
     }, false);
 
     //if the key will be released, change the states object 
@@ -973,11 +995,11 @@ function modifySettings() {
             inputStates.ice = false;
         } else if ((event.key === "f") || (event.key === "F")) {
             inputStates.forceshield = false;
-        } 
+        }
         else if ((event.key === "k") || (event.key === "K")) {
             inputStates.sucide = false;
-        } 
-        
+        }
+
 
     }, false);
 }
