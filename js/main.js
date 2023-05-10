@@ -4,7 +4,7 @@ import Level from "./Level.js";
 
 let level=new Level(10,5,1,11,300)
 level.generate_grid()
-console.log(level.grid)
+
 let canvas;
 let engine;
 let scene;
@@ -37,7 +37,6 @@ function startGame() {
 
     init_music(scene)
 
-    summonEntity(scene, "mutant", 75 ,0, 75);
 
     let walls=[];
     let portes=[];
@@ -70,7 +69,6 @@ function startGame() {
         // tank.takeDamage(50); // debug
 
         //moveHeroDude();
-        moveOtherDudes();
 
         // attention ça pique les yeux.
         // le asset loader marche pas 
@@ -79,6 +77,13 @@ function startGame() {
 
         walls.forEach(m => {
             m.update(pt_fixe);
+        });
+
+        level.room.forEach(element => {
+            element.caracter_in_room(pt_fixe)
+            if (element.in_room){
+                moveOtherDudes(element.id_room);
+            }
         });
 
         scene.render();
@@ -114,7 +119,7 @@ var entities = {
 };
 
 
-function summonEntity(scene, entity_name, coord_x = 0, coord_y = 0, coord_z = 0){
+function summonEntity(scene, entity_name,room_id, coord_x = 0, coord_y = 0, coord_z = 0){
 
     // console.log("entity_name ", entity_name)
     // console.log("entities[entity_name].dir", entities[entity_name].dir)
@@ -124,20 +129,17 @@ function summonEntity(scene, entity_name, coord_x = 0, coord_y = 0, coord_z = 0)
         let entity = newMeshes[0];
         entity.position = new BABYLON.Vector3(coord_x, coord_y, coord_z);
         entity.name = entity_name + "_" + entities[entity_name].count++ ;
-        
+        entity.room_id=room_id;
         if(entity_name == "mutant"){
             entity.rotation.x = -Math.PI / 2;
             entity.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         }
         
-        // console.log("Spawning :", entity.name);
-
+        
         setTimeout(() => {
-            let coucouMonsieur = new Dude(entity, entity.name, 0.7, 0.5 , scene);
-            // console.log("monsieur :", coucouMonsieur)
             scene.dudes.push(entity);
-            // console.log("scene.dudes",scene.dudes)
-        }, 1000);
+            let coucouMonsieur = new Dude(entity, entity.name, 0.5, 0.5 , scene);
+        }, 5000);
 
     });
 
@@ -174,16 +176,12 @@ function createScene() {
     // create_room();
 
 
-    console.log(pt_fixe)
-    console.log(tank)
     // second parameter is the target to follow
     let followCamera = createFollowCameraV1(scene, pt_fixe);
     scene.activeCamera = followCamera;
 
     createLights(scene);
-
     createHeroDude(scene);
-
     createIcePick(scene);
 
     level.build_level();
@@ -195,9 +193,9 @@ function createScene() {
 
     level.room.forEach(element => {
         for (let index = 0; index < element.Tab_ennemies.length; index++) {
-            let x,z,state;
-            [x,z,state]=element.Tab_ennemies[index];
-            summonEntity(scene,"mutant",x,1,z)
+            let x,z,state,room_id;
+            [x,z,state,room_id]=element.Tab_ennemies[index];
+            summonEntity(scene,"mutant",room_id,x,1,z)
         }
     });
 
@@ -209,7 +207,7 @@ function createScene() {
 function createIcePick(scene) {
     BABYLON.SceneLoader.ImportMesh("", "models/ice_pick/", "Ice_Spike.babylon", scene, function (newMeshes) {
         let ice = newMeshes[0];
-        ice.position = new BABYLON.Vector3(0, 2, 0);
+        ice.position = new BABYLON.Vector3(-100, -25, -100);
         ice.scaling = new BABYLON.Vector3(1, 1, 1);
         ice.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
         ice.name = "iceball";
@@ -266,7 +264,6 @@ function createFreeCamera(scene) {
 }
 
 function createFollowCameraV1(scene, target) {
-    console.log(target)
     let camera = new BABYLON.FollowCamera("tankFollowCamera", target.position, scene, target);
 
     camera.radius = 150; // how far from the object to follow
@@ -278,19 +275,6 @@ function createFollowCameraV1(scene, target) {
     return camera;
 }
 
-// V2 --> depuis le plafond
-function createFollowCamera(scene, target) {
-    console.log(target)
-    let camera = new BABYLON.FollowCamera("tankFollowCamera", target.position, scene, target);
-
-    camera.radius = 0; // how far from the object to follow
-    camera.heightOffset = 200; // how high above the object to place the camera
-    camera.rotationOffset = 0; // the viewing angle
-    camera.cameraAcceleration = .1; // how fast to move
-    camera.maxCameraSpeed = 5; // speed limit
-
-    return camera;
-}
 
 function create_pt_fixe_camera(scene) {
     let pt_fixe = new BABYLON.MeshBuilder.CreateBox("cam_lock", { height: 0.5, depth: 3, width: 3 }, scene);
@@ -1021,22 +1005,16 @@ function createTank(scene) {
 }
 
 
-function create_room(scene) {
-    BABYLON.SceneLoader.ImportMesh("", "models/", "RoomV4.babylon", scene, function (newMeshes) {
-        let room = newMeshes[0];
-        room.position = new BABYLON.Vector3(0, 0.5, 0);
-        room.scaling = new BABYLON.Vector3(10, 10, 10);
-    })
-}
 
 function createHeroDude(scene) {
     // load the Dude 3D animated model
     // name, folder, skeleton name 
     BABYLON.SceneLoader.ImportMesh("him", "models/Dude/", "Dude.babylon", scene, (newMeshes, particleSystems, skeletons) => {
         let heroDude = newMeshes[0];
-        heroDude.position = new BABYLON.Vector3(0, 0, 5);  // The original dude
+        heroDude.position = new BABYLON.Vector3(0, -50, 5);  // The original dude
         // make it smaller 
         //heroDude.speed = 0.1;
+        heroDude.isVisible=false;
 
         // give it a name so that we can query the scene to get it by name
         heroDude.name = "heroDude";
@@ -1106,21 +1084,17 @@ function doClone(originalMesh, skeletons, id) {
     return myClone;
 }
 
-function moveHeroDude() {
-    let heroDude = scene.getMeshByName("heroDude");
-    if (heroDude)
-        heroDude.Dude.move(scene);
-}
-
-function moveOtherDudes() {
+function moveOtherDudes(room_id) {
     if (scene.dudes) {
         for (var i = 0; i < scene.dudes.length; i++) {
-            if(scene.dudes[i].Dude != undefined) scene.dudes[i].Dude.move(scene);
-            
+            if(scene.dudes[i].Dude != undefined){
+                if (scene.dudes[i].room_id===room_id){
+                    scene.dudes[i].Dude.move(scene);
+                } 
+            }
         }
     }
 }
-
 window.addEventListener("resize", () => {
     engine.resize()
 });
