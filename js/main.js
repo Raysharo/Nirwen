@@ -102,7 +102,9 @@ var entities = {
     },
     "mutant": {
         "dir": "models/Mutant/",
-        "file": "mutant.babylon",
+        //"file": "mutant.babylon",
+        "file": "Mutant.babylon", // the fisrt letter is now in upper case, idk why
+        
         "count": 0
     },
     "ice_pick" : {
